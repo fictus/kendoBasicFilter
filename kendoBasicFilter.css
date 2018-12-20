@@ -1,0 +1,48 @@
+﻿body .k-grid table thead th.kendobasicfilter-column {
+	padding-right: 30px !important;
+    position: relative;
+}
+body .k-grid table thead tr.kendo-basicfilter-filter-row th.kendo-basicfilter-filter-options {
+	text-align: left !important;
+	background-color: #F3F4F4 !important;
+}
+.k-grid thead th.kendobasicfilter-column .lnk-kendobasicfilter-current-col-data {
+	position: absolute;
+	top: 9px;
+	right: 3px;
+}
+#kendoBasicFilterSearchBox div {
+	padding: 5px;
+}
+#kendoBasicFilterSearchBox .kendobasicfilter-filter-txt {
+	width: 100%;
+}
+#kendoBasicFilterSearchBox button {
+	color: black;
+	min-width: 65px;
+}
+#kendoBasicFilterSearchBox .kendobasicfilter-filter-btn-filter {
+	float: right;
+    margin-left: 10px;
+}
+.kendo-basicfilter-filter-options span {
+	position: relative;
+	padding: 2px;
+	padding-right: 20px;
+	background-color: #FBC538;
+	font-weight: normal;
+	color: black;
+	margin-left: 3px;
+	margin-right: 3px;
+	white-space: nowrap;
+}
+.kendo-basicfilter-filter-options span label {
+	color: black;
+}
+.kendo-basicfilter-filter-options a {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	font-weight: normal;
+	color: gray !important;
+}
