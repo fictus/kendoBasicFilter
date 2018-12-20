@@ -228,7 +228,7 @@
                     if (currentFilterOptions[filterKey].dataType == "date") {
                         var currentDateFormat = currentFilterOptions[filterKey].dateFormat || "MM/DD/YYYY";
                         currentOperator = function (fieldVal, filterText) {
-                            return !isNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1;
+                            return !kendoBasicFilterIsNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1;
                         };
 
                         currentFilterArray.push({
@@ -238,7 +238,7 @@
                         });
                     } else if (currentFilterOptions[filterKey].dataType == "number") {
                         currentOperator = function (fieldVal, filterText) {
-                            return !isNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
+                            return !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
                         };
 
                         currentFilterArray.push({
@@ -257,7 +257,7 @@
                     } else if (currentFilterOptions[filterKey].dataType == "numberOperator") {
                         if (currentFilterOptions[filterKey].logicValue == "=") {
                             currentOperator = function (fieldVal, filterText) {
-                                return !isNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
+                                return !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
                             };
 
                             currentFilterArray.push({
@@ -271,7 +271,7 @@
                                     return false;
                                 }
 
-                                return !isNull(fieldVal) && parseFloat(fieldVal) > parseFloat(filterText);
+                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) > parseFloat(filterText);
                             };
 
                             currentFilterArray.push({
@@ -285,7 +285,7 @@
                                     return false;
                                 }
 
-                                return !isNull(fieldVal) && parseFloat(fieldVal) < parseFloat(filterText);
+                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) < parseFloat(filterText);
                             };
 
                             currentFilterArray.push({
@@ -301,7 +301,7 @@
                                 var isFilterDesiredOption = false;
 
                                 for (var i = 0; i < filterTextArray.length; i++) {
-                                    isFilterDesiredOption = !isNull(fieldVal) && (fieldVal + "").toLowerCase() == (filterTextArray[i] + "").toLowerCase();
+                                    isFilterDesiredOption = !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase() == (filterTextArray[i] + "").toLowerCase();
 
                                     if (isFilterDesiredOption) {
                                         break;
@@ -441,7 +441,7 @@
                     if (currentFilterOptions[filterKey].dataType == "date") {
                         var currentDateFormat = currentFilterOptions[filterKey].dateFormat || "MM/DD/YYYY";
                         currentOperator = function (fieldVal, filterText) {
-                            return !isNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1;
+                            return !kendoBasicFilterIsNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1;
                         };
 
                         currentFilterArray.push({
@@ -451,7 +451,7 @@
                         });
                     } else if (currentFilterOptions[filterKey].dataType == "number") {
                         currentOperator = function (fieldVal, filterText) {
-                            return !isNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
+                            return !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
                         };
 
                         currentFilterArray.push({
@@ -470,7 +470,7 @@
                     } else if (currentFilterOptions[filterKey].dataType == "numberOperator") {
                         if (currentFilterOptions[filterKey].logicValue == "=") {
                             currentOperator = function (fieldVal, filterText) {
-                                return !isNull(fieldVal) && parseFloat(fieldVal) == parseFloat(filterText);
+                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) == parseFloat(filterText);
                             };
 
                             currentFilterArray.push({
@@ -484,7 +484,7 @@
                                     return false;
                                 }
 
-                                return !isNull(fieldVal) && parseFloat(fieldVal) > parseFloat(filterText);
+                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) > parseFloat(filterText);
                             };
 
                             currentFilterArray.push({
@@ -498,7 +498,7 @@
                                     return false;
                                 }
 
-                                return !isNull(fieldVal) && parseFloat(fieldVal) < parseFloat(filterText);
+                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) < parseFloat(filterText);
                             };
 
                             currentFilterArray.push({
@@ -514,7 +514,7 @@
                                 var isFilterDesiredOption = false;
 
                                 for (var i = 0; i < filterTextArray.length; i++) {
-                                    isFilterDesiredOption = !isNull(fieldVal) && (fieldVal + "").toLowerCase() == (filterTextArray[i] + "").toLowerCase();
+                                    isFilterDesiredOption = !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase() == (filterTextArray[i] + "").toLowerCase();
 
                                     if (isFilterDesiredOption) {
                                         break;
@@ -671,4 +671,8 @@ function kendoBasicFilterToText(inValue) {
     rawText = rawText.replace(/\n/g, ' ');
 
     return rawText;
+}
+
+function kendoBasicFilterIsNull(num) {
+    return !num && num + "" == "null" || !num && num + "" == "undefined";
 }
