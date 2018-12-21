@@ -1,5 +1,5 @@
 ﻿/*
-    kendoBasicFilter ver: 1.0.1
+    kendoBasicFilter ver: 1.0.2
 
 
     How to Use
@@ -117,7 +117,7 @@
             
             if (filterBtnField in defaultFilterOptions) {
                 $(this).find(".lnk-kendobasicfilter-current-col-data").remove();
-                $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i class='fa fa-filter'></i></a>");
+                $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i class='k-icon k-filter'></i></a>");
                 $(this).addClass("kendobasicfilter-column");
             }
         });
