@@ -117,7 +117,7 @@
             
             if (filterBtnField in defaultFilterOptions) {
                 $(this).find(".lnk-kendobasicfilter-current-col-data").remove();
-                $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i class='k-icon k-filter'></i></a>");
+                $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i class='glyphicon glyphicon-filter'></i></a>"); //k-icon k-filter
                 $(this).addClass("kendobasicfilter-column");
             }
         });
