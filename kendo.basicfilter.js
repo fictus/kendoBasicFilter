@@ -1,5 +1,5 @@
 ﻿/*
-    kendoBasicFilter ver: 1.0.2
+    kendoBasicFilter ver: 1.0.3
 
 
     How to Use
@@ -15,6 +15,7 @@
                 "color": "white"
             },
             serverFiltering: true,
+			// filterIconClass: "fa fa-filter", 		-- assing a custom icon class here (if you need to use a different icon then the default)
             filterChanged: function (e) {
                 // if needed, we can capture all the current state of all the filter objects
                 // to do something meaningfull with them or to call other functions after filtering
@@ -116,22 +117,13 @@
             var filterBtnField = $(this).attr("data-field");
             
             if (filterBtnField in defaultFilterOptions) {
+				var iconClass = ("filterIconClass" in defaultFilterOptions.filterBoxOptions ? defaultFilterOptions.filterBoxOptions.filterIconClass : "k-icon k-filter");
                 $(this).find(".lnk-kendobasicfilter-current-col-data").remove();
-                $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i class='k-icon k-i-filter'></i></a>");
+                $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i></i></a>");
+				$(this).find("a.lnk-kendobasicfilter-current-col-data i").addClass(iconClass);
                 $(this).addClass("kendobasicfilter-column");
             }
         });
-        //$(this).find("thead").find("th").each(function () {
-        //    if (!$(this).is("[data-filterableheader='false']")) {
-        //        gridFilter[$(this).attr("data-field")] = {
-        //            filterText: "",
-        //            dataType: "string"
-        //        };
-
-        //        $(this).find(".lnk-kendobasicfilter-current-col-data").remove();
-        //        $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i class='fa fa-filter'></i></a>");
-        //    }
-        //});
         
         $(this).data("kendoBasicFilter", defaultFilterOptions);
         $(this).data("kendobasicfilterInitialized", true);
