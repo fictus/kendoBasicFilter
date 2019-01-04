@@ -6,8 +6,8 @@ An alternate filter control for KendoGrids if you don't want to use the default 
     ----------
     After you initiate your kendoGrid then apply kendoBasicFilter like this:
 
-	```
-	#!javascript
+```
+#!javascript
     $("#tblData").kendoBasicFilter({
         filterBoxOptions: {
             filterBoxStyle: {
@@ -94,11 +94,11 @@ An alternate filter control for KendoGrids if you don't want to use the default 
             dateFormat: "MM/DD/YYYY" // see moment.js date formats for more options
         }
     });
-	```
+```
 	
     
     You can also manually refresh the filters by calling this method:
-	```
-	#!javascript
+```
+#!javascript
         $("#tblData").data("kendoBasicFilter").filterBoxOptions.triggerFilter($("#tblData")[0]);
-	```
+```
