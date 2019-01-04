@@ -1,10 +1,12 @@
 kendoBasicFilter ver: 1.0.4
 
-An alternate filter control for KendoGrids if you don't want to use the default Kendo Filter controls;
+An alternate filter control for Kendo Grids if you don't want to use the default Kendo Filter controls;
 
-    How to Use
-    ----------
-    After you initiate your kendoGrid then apply kendoBasicFilter like this:
+See full working jsfiddle Demo: [HERE](http://jsfiddle.net/fictus/35eob1f6/)
+
+How to Use
+----------
+After you initiate your kendoGrid then apply kendoBasicFilter like this:
 
 ```
 #!javascript
@@ -97,7 +99,7 @@ An alternate filter control for KendoGrids if you don't want to use the default 
 ```
 	
     
-    You can also manually refresh the filters by calling this method:
+You can also manually refresh the filters by calling this method:
 ```
 #!javascript
         $("#tblData").data("kendoBasicFilter").filterBoxOptions.triggerFilter($("#tblData")[0]);
