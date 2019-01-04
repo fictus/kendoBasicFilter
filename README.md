@@ -1,4 +1,5 @@
 kendoBasicFilter ver: 1.0.4
+----------
 
 An alternate filter control for Kendo Grids if you don't want to use the default Kendo Filter controls;
 
