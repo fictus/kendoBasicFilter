@@ -1,5 +1,5 @@
 ﻿/*
-    kendoBasicFilter ver: 1.0.3
+    kendoBasicFilter ver: 1.0.4
 
 
     How to Use
@@ -16,6 +16,11 @@
             },
             serverFiltering: true,
 			// filterIconClass: "fa fa-filter", 		-- assing a custom icon class here (if you need to use a different icon then the default)
+            masterFilterText: function () {
+                // if we need to do an "OR" master search alongside our filters, we can pass the filterText here;
+
+                return $("#txtMasterSearch").val();
+            },
             filterChanged: function (e) {
                 // if needed, we can capture all the current state of all the filter objects
                 // to do something meaningfull with them or to call other functions after filtering
@@ -88,6 +93,10 @@
         }
     });
 
+    
+    You can also manually refresh the filters by calling this method:
+        $("#tblData").data("kendoBasicFilter").filterBoxOptions.triggerFilter($("#tblData")[0]);
+
 */
 
 (function ($) {
@@ -112,19 +121,23 @@
         };
 
         var defaultFilterOptions = $.extend(gridFilter, options);
+        defaultFilterOptions.filterBoxOptions.triggerFilter = function (callerObject) {
+            var currentFilterOptions = $(callerObject).data("kendoBasicFilter");
+            kendoBasicFilterApplyFilter(currentFilterOptions, $(callerObject).find("table").find("tr").first().find("th").first());
+        };
 
         $(this).find("thead").find("tr").first().find("th").each(function () {
             var filterBtnField = $(this).attr("data-field");
-            
+
             if (filterBtnField in defaultFilterOptions) {
-				var iconClass = ("filterIconClass" in defaultFilterOptions.filterBoxOptions ? defaultFilterOptions.filterBoxOptions.filterIconClass : "k-icon k-filter");
+                var iconClass = ("filterIconClass" in defaultFilterOptions.filterBoxOptions ? defaultFilterOptions.filterBoxOptions.filterIconClass : "k-icon k-filter");
                 $(this).find(".lnk-kendobasicfilter-current-col-data").remove();
                 $(this).append("<a class='lnk-kendobasicfilter-current-col-data' href='#'><i></i></a>");
-				$(this).find("a.lnk-kendobasicfilter-current-col-data i").addClass(iconClass);
+                $(this).find("a.lnk-kendobasicfilter-current-col-data i").addClass(iconClass);
                 $(this).addClass("kendobasicfilter-column");
             }
         });
-        
+
         $(this).data("kendoBasicFilter", defaultFilterOptions);
         $(this).data("kendobasicfilterInitialized", true);
 
@@ -200,125 +213,7 @@
                     currentFilterOptions[currentFilterData].filterText = "";
                 }
 
-                var currentFilterArray = [];
-                $.each(currentFilterOptions, function (filterKey, filterValue) {
-                    if (filterKey == "filterBoxOptions") {
-                        return;
-                    }
-
-                    /*   12/20/18 - not adding empty filtertext items   */
-                    var isFilterTextEmpty = ($.isArray(currentFilterOptions[filterKey].filterText) ?
-                        (currentFilterOptions[filterKey].filterText.length == 0) :
-                        (currentFilterOptions[filterKey].filterText == ""));
-                    
-                    if (isFilterTextEmpty) {
-                        return;
-                    }
-
-                    var currentOperator;
-
-                    if (currentFilterOptions[filterKey].dataType == "date") {
-                        var currentDateFormat = currentFilterOptions[filterKey].dateFormat || "MM/DD/YYYY";
-                        currentOperator = function (fieldVal, filterText) {
-                            return !kendoBasicFilterIsNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1;
-                        };
-
-                        currentFilterArray.push({
-                            field: filterKey,
-                            operator: currentOperator,
-                            value: currentFilterOptions[filterKey].filterText
-                        });
-                    } else if (currentFilterOptions[filterKey].dataType == "number") {
-                        currentOperator = function (fieldVal, filterText) {
-                            return !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
-                        };
-
-                        currentFilterArray.push({
-                            field: filterKey,
-                            operator: currentOperator,
-                            value: currentFilterOptions[filterKey].filterText
-                        });
-                    } else if (currentFilterOptions[filterKey].dataType == "string") {
-                        currentOperator = "contains";
-
-                        currentFilterArray.push({
-                            field: filterKey,
-                            operator: currentOperator,
-                            value: currentFilterOptions[filterKey].filterText
-                        });
-                    } else if (currentFilterOptions[filterKey].dataType == "numberOperator") {
-                        if (currentFilterOptions[filterKey].logicValue == "=") {
-                            currentOperator = function (fieldVal, filterText) {
-                                return !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: currentFilterOptions[filterKey].filterText
-                            });
-                        } else if (currentFilterOptions[filterKey].logicValue == ">") {
-                            currentOperator = function (fieldVal, filterText) {
-                                if (isNaN(fieldVal) || isNaN(filterText)) {
-                                    return false;
-                                }
-
-                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) > parseFloat(filterText);
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: currentFilterOptions[filterKey].filterText
-                            });
-                        } else if (currentFilterOptions[filterKey].logicValue == "<") {
-                            currentOperator = function (fieldVal, filterText) {
-                                if (isNaN(fieldVal) || isNaN(filterText)) {
-                                    return false;
-                                }
-
-                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) < parseFloat(filterText);
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: currentFilterOptions[filterKey].filterText
-                            });
-                        }
-                    } else if (currentFilterOptions[filterKey].dataType == "multiSelect") {
-                        if ($.isArray(currentFilterOptions[filterKey].filterText) && currentFilterOptions[filterKey].filterText.length) {
-                            currentOperator = function (fieldVal, filterText) {
-                                var filterTextArray = $.parseJSON(filterText);
-                                var isFilterDesiredOption = false;
-
-                                for (var i = 0; i < filterTextArray.length; i++) {
-                                    isFilterDesiredOption = !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase() == (filterTextArray[i] + "").toLowerCase();
-
-                                    if (isFilterDesiredOption) {
-                                        break;
-                                    }
-                                }
-
-                                return isFilterDesiredOption;
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: JSON.stringify(currentFilterOptions[filterKey].filterText)
-                            });
-                        }
-                    }
-                });
-
-                if (!currentFilterOptions.filterBoxOptions.serverFiltering) {
-                    $("body").find(currentCallerObject).closest("table").parent().data("kendoGrid").dataSource.filter([]);
-                    $("body").find(currentCallerObject).closest("table").parent().data("kendoGrid").dataSource.filter({
-                        logic: "and",
-                        filters: currentFilterArray
-                    });
-                }
+                kendoBasicFilterApplyFilter(currentFilterOptions, currentCallerObject);
 
                 $("body").find(currentCallerObject).closest("table").parent().data("kendoBasicFilter", currentFilterOptions);
 
@@ -387,7 +282,7 @@
                     } else {
                         $(filterLblSpan).append("<label>" + kendoBasicFilterToText(currentFilterTitle) + ":</label> " + filterLblNumberOperator + filterLblFilterSelectedValues);
                     }
-                    
+
                     $(filterLblSpan).append("<a href='#'><i class='fa fa-close'></i></a>");
 
                     $(filterLblSpan).find("a").on("click", function (e) {
@@ -413,125 +308,7 @@
                     currentFilterLabels.parent().css("display", "none");
                 }
 
-                var currentFilterArray = [];
-                $.each(currentFilterOptions, function (filterKey, filterValue) {
-                    if (filterKey == "filterBoxOptions") {
-                        return;
-                    }
-
-                    /*   12/20/18 - not adding empty filtertext items   */
-                    var isFilterTextEmpty = ($.isArray(currentFilterOptions[filterKey].filterText) ?
-                        (currentFilterOptions[filterKey].filterText.length == 0) :
-                        (currentFilterOptions[filterKey].filterText == ""));
-                    
-                    if (isFilterTextEmpty) {
-                        return;
-                    }
-
-                    var currentOperator;
-
-                    if (currentFilterOptions[filterKey].dataType == "date") {
-                        var currentDateFormat = currentFilterOptions[filterKey].dateFormat || "MM/DD/YYYY";
-                        currentOperator = function (fieldVal, filterText) {
-                            return !kendoBasicFilterIsNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1;
-                        };
-
-                        currentFilterArray.push({
-                            field: filterKey,
-                            operator: currentOperator,
-                            value: currentFilterOptions[filterKey].filterText
-                        });
-                    } else if (currentFilterOptions[filterKey].dataType == "number") {
-                        currentOperator = function (fieldVal, filterText) {
-                            return !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1;
-                        };
-
-                        currentFilterArray.push({
-                            field: filterKey,
-                            operator: currentOperator,
-                            value: currentFilterOptions[filterKey].filterText
-                        });
-                    } else if (currentFilterOptions[filterKey].dataType == "string") {
-                        currentOperator = "contains";
-
-                        currentFilterArray.push({
-                            field: filterKey,
-                            operator: currentOperator,
-                            value: currentFilterOptions[filterKey].filterText
-                        });
-                    } else if (currentFilterOptions[filterKey].dataType == "numberOperator") {
-                        if (currentFilterOptions[filterKey].logicValue == "=") {
-                            currentOperator = function (fieldVal, filterText) {
-                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) == parseFloat(filterText);
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: currentFilterOptions[filterKey].filterText
-                            });
-                        } else if (currentFilterOptions[filterKey].logicValue == ">") {
-                            currentOperator = function (fieldVal, filterText) {
-                                if (isNaN(fieldVal) || isNaN(filterText)) {
-                                    return false;
-                                }
-
-                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) > parseFloat(filterText);
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: currentFilterOptions[filterKey].filterText
-                            });
-                        } else if (currentFilterOptions[filterKey].logicValue == "<") {
-                            currentOperator = function (fieldVal, filterText) {
-                                if (isNaN(fieldVal) || isNaN(filterText)) {
-                                    return false;
-                                }
-
-                                return !kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) < parseFloat(filterText);
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: currentFilterOptions[filterKey].filterText
-                            });
-                        }
-                    } else if (currentFilterOptions[filterKey].dataType == "multiSelect") {
-                        if ($.isArray(currentFilterOptions[filterKey].filterText) && currentFilterOptions[filterKey].filterText.length) {
-                            currentOperator = function (fieldVal, filterText) {
-                                var filterTextArray = $.parseJSON(filterText);
-                                var isFilterDesiredOption = false;
-
-                                for (var i = 0; i < filterTextArray.length; i++) {
-                                    isFilterDesiredOption = !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase() == (filterTextArray[i] + "").toLowerCase();
-
-                                    if (isFilterDesiredOption) {
-                                        break;
-                                    }
-                                }
-
-                                return isFilterDesiredOption;
-                            };
-
-                            currentFilterArray.push({
-                                field: filterKey,
-                                operator: currentOperator,
-                                value: JSON.stringify(currentFilterOptions[filterKey].filterText)
-                            });
-                        }
-                    }
-                });
-
-                if (!currentFilterOptions.filterBoxOptions.serverFiltering) {
-                    $("body").find(currentCallerObject).closest("table").parent().data("kendoGrid").dataSource.filter([]);
-                    $("body").find(currentCallerObject).closest("table").parent().data("kendoGrid").dataSource.filter({
-                        logic: "and",
-                        filters: currentFilterArray
-                    });
-                }
+                kendoBasicFilterApplyFilter(currentFilterOptions, currentCallerObject);
 
                 $("body").find(currentCallerObject).closest("table").parent().data("kendoBasicFilter", currentFilterOptions);
 
@@ -656,6 +433,228 @@
         });
     };
 }(jQuery));
+
+function kendoBasicFilterApplyFilter(currentFilterOptions, currentCallerObject) {
+    /*   1/4/19 - added way to also apply one master text filter accross all columns  */
+    var masterFilterText = ("masterFilterText" in currentFilterOptions.filterBoxOptions ? currentFilterOptions.filterBoxOptions.masterFilterText() : "") || "";
+
+    var currentFilterArray = [];
+    var currentMasterFilterArray = [];
+
+    $.each(currentFilterOptions, function (filterKey, filterValue) {
+        if (filterKey == "filterBoxOptions") {
+            return;
+        }
+
+        /*   12/20/18 - not adding empty filtertext items   */
+        var isFilterTextEmpty = ($.isArray(currentFilterOptions[filterKey].filterText) ?
+            (currentFilterOptions[filterKey].filterText.length == 0) :
+            (currentFilterOptions[filterKey].filterText == ""));
+
+        if (isFilterTextEmpty && masterFilterText == "") {
+            return;
+        }
+
+        var currentOperator;
+
+        if (currentFilterOptions[filterKey].dataType == "date") {
+            if (currentFilterOptions[filterKey].filterText != "") {
+                var currentDateFormat = currentFilterOptions[filterKey].dateFormat || "MM/DD/YYYY";
+                currentOperator = function (fieldVal, filterText) {
+                    return (!kendoBasicFilterIsNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1);
+                };
+
+                currentFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: currentFilterOptions[filterKey].filterText
+                });
+            }
+
+            if (masterFilterText != "") {
+                var currentDateFormat = currentFilterOptions[filterKey].dateFormat || "MM/DD/YYYY";
+                currentOperator = function (fieldVal, filterText) {
+                    return (!kendoBasicFilterIsNull(fieldVal) && moment(fieldVal).format(currentDateFormat).indexOf(filterText) != -1);
+                };
+
+                currentMasterFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: masterFilterText
+                });
+            }
+        } else if (currentFilterOptions[filterKey].dataType == "number") {
+            if (currentFilterOptions[filterKey].filterText != "") {
+                currentOperator = function (fieldVal, filterText) {
+                    return (!kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").indexOf(filterText) != -1);
+                };
+
+                currentFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: currentFilterOptions[filterKey].filterText
+                });
+            }
+
+            if (masterFilterText != "") {
+                currentOperator = function (fieldVal, filterText) {
+                    return (!kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase().indexOf(filterText.toLowerCase()) != -1);
+                };
+
+                currentMasterFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: masterFilterText
+                });
+            }
+        } else if (currentFilterOptions[filterKey].dataType == "string") {
+            if (currentFilterOptions[filterKey].filterText != "") {
+                currentOperator = "Contains";
+
+                currentFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: currentFilterOptions[filterKey].filterText
+                });
+            }
+
+            if (masterFilterText != "") {
+                currentOperator = "Contains";
+
+                currentMasterFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: masterFilterText
+                });
+            }
+        } else if (currentFilterOptions[filterKey].dataType == "numberOperator") {
+            if (currentFilterOptions[filterKey].filterText != "") {
+                if (currentFilterOptions[filterKey].logicValue == "=") {
+                    currentOperator = function (fieldVal, filterText) {
+                        if (isNaN(fieldVal) || isNaN(filterText)) {
+                            return false;
+                        }
+
+                        return (!kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) == parseFloat(filterText));
+                    };
+
+                    currentFilterArray.push({
+                        field: filterKey,
+                        operator: currentOperator,
+                        value: currentFilterOptions[filterKey].filterText
+                    });
+                } else if (currentFilterOptions[filterKey].logicValue == ">") {
+                    currentOperator = function (fieldVal, filterText) {
+                        if (isNaN(fieldVal) || isNaN(filterText)) {
+                            return false;
+                        }
+
+                        return (!kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) > parseFloat(filterText));
+                    };
+
+                    currentFilterArray.push({
+                        field: filterKey,
+                        operator: currentOperator,
+                        value: currentFilterOptions[filterKey].filterText
+                    });
+                } else if (currentFilterOptions[filterKey].logicValue == "<") {
+                    currentOperator = function (fieldVal, filterText) {
+                        if (isNaN(fieldVal) || isNaN(filterText)) {
+                            return false;
+                        }
+
+                        return (!kendoBasicFilterIsNull(fieldVal) && parseFloat(fieldVal) < parseFloat(filterText));
+                    };
+
+                    currentFilterArray.push({
+                        field: filterKey,
+                        operator: currentOperator,
+                        value: currentFilterOptions[filterKey].filterText
+                    });
+                }
+            }
+
+            if (masterFilterText != "") {
+                currentOperator = function (fieldVal, filterText) {
+                    return (!kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase().indexOf(filterText.toLowerCase()) != -1);
+                };
+
+                currentMasterFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: masterFilterText
+                });
+            }
+        } else if (currentFilterOptions[filterKey].dataType == "multiSelect") {
+            if ($.isArray(currentFilterOptions[filterKey].filterText) && currentFilterOptions[filterKey].filterText.length) {
+                currentOperator = function (fieldVal, filterText) {
+                    var filterTextArray = $.parseJSON(filterText);
+                    var isFilterDesiredOption = false;
+
+                    for (var i = 0; i < filterTextArray.length; i++) {
+                        isFilterDesiredOption = !kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase() == (filterTextArray[i] + "").toLowerCase();
+
+                        if (isFilterDesiredOption) {
+                            break;
+                        }
+                    }
+
+                    return isFilterDesiredOption;
+                };
+
+                currentFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: JSON.stringify(currentFilterOptions[filterKey].filterText)
+                });
+            }
+
+            if (masterFilterText != "") {
+                currentOperator = function (fieldVal, filterText) {
+                    return (!kendoBasicFilterIsNull(fieldVal) && (fieldVal + "").toLowerCase().indexOf(filterText.toLowerCase()) != -1);
+                };
+
+                currentMasterFilterArray.push({
+                    field: filterKey,
+                    operator: currentOperator,
+                    value: masterFilterText
+                });
+            }
+        }
+    });
+
+    var finalFilterOperationControls;
+
+    if (currentFilterArray.length && currentMasterFilterArray.length) {
+        finalFilterOperationControls = [];
+        finalFilterOperationControls.push({
+            logic: "and",
+            filters: currentFilterArray
+        });
+        finalFilterOperationControls.push({
+            logic: "or",
+            filters: currentMasterFilterArray
+        });
+    } else {
+        if (currentFilterArray.length) {
+            finalFilterOperationControls = {
+                logic: "and",
+                filters: currentFilterArray
+            };
+        }
+        if (currentMasterFilterArray.length) {
+            finalFilterOperationControls = {
+                logic: "or",
+                filters: currentMasterFilterArray
+            };
+        }
+    }
+
+    if (!currentFilterOptions.filterBoxOptions.serverFiltering) {
+        $("body").find(currentCallerObject).closest("table").parent().data("kendoGrid").dataSource.filter([]);
+        $("body").find(currentCallerObject).closest("table").parent().data("kendoGrid").dataSource.filter(finalFilterOperationControls);
+    }
+}
 
 function kendoBasicFilterToText(inValue) {
     inValue = inValue.replace(/\<br\>/g, ' ');
