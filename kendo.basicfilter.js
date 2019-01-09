@@ -1,5 +1,5 @@
 ﻿/*
-    kendoBasicFilter ver: 1.0.4
+    kendoBasicFilter ver: 1.0.4.2
 
 
     How to Use
@@ -16,6 +16,7 @@
             },
             serverFiltering: true,
 			// filterIconClass: "fa fa-filter", 		-- assing a custom icon class here (if you need to use a different icon then the default)
+            // removeFilterIconClass: "fa fa-close", 	-- assing a custom icon class here (if you need to use a different icon then the default)
             masterFilterText: function () {
                 // if we need to do an "OR" master search alongside our filters, we can pass the filterText here;
 
@@ -95,7 +96,11 @@
 
     
     You can also manually refresh the filters by calling this method:
-        $("#tblData").data("kendoBasicFilter").filterBoxOptions.triggerFilter($("#tblData")[0]);
+        $("#tblData").data("kendoBasicFilter").filterBoxOptions.triggerFilter($("#tblData"));
+
+
+    You can also manually refresh the filters by calling this method:
+        $("#tblData").data("kendoBasicFilter").filterBoxOptions.clearAllFilters($("#tblData"));
 
 */
 
@@ -123,6 +128,32 @@
         var defaultFilterOptions = $.extend(gridFilter, options);
         defaultFilterOptions.filterBoxOptions.triggerFilter = function (callerObject) {
             var currentFilterOptions = $(callerObject).data("kendoBasicFilter");
+            kendoBasicFilterApplyFilter(currentFilterOptions, $(callerObject).find("table").find("tr").first().find("th").first());
+        };
+        defaultFilterOptions.filterBoxOptions.clearAllFilters = function (callerObject) {
+            var currentFilterLabels = $(callerObject).find("table").find("thead").find("tr.kendo-basicfilter-filter-row").find(".kendo-basicfilter-filter-options");
+            $(currentFilterLabels).children().remove();
+
+            if (currentFilterLabels.find("span").length) {
+                currentFilterLabels.parent().css("display", "");
+            } else {
+                currentFilterLabels.parent().css("display", "none");
+            }
+
+            var currentFilterOptions = $(callerObject).data("kendoBasicFilter");
+
+            $.each(currentFilterOptions, function (key, val) {
+                if (currentFilterOptions[key].dataType == "numberOperator") {
+                    currentFilterOptions[key].logicValue = "";
+                }
+                if (currentFilterOptions[key].dataType == "multiSelect") {
+                    currentFilterOptions[key].filterText = [];
+                } else {
+                    currentFilterOptions[key].filterText = "";
+                }
+            });
+
+            $(callerObject).data("kendoBasicFilter", currentFilterOptions);
             kendoBasicFilterApplyFilter(currentFilterOptions, $(callerObject).find("table").find("tr").first().find("th").first());
         };
 
@@ -283,7 +314,8 @@
                         $(filterLblSpan).append("<label>" + kendoBasicFilterToText(currentFilterTitle) + ":</label> " + filterLblNumberOperator + filterLblFilterSelectedValues);
                     }
 
-                    $(filterLblSpan).append("<a href='#'><i class='fa fa-close'></i></a>");
+                    var removeIconClass = ("removeFilterIconClass" in currentFilterOptions.filterBoxOptions ? currentFilterOptions.filterBoxOptions.removeFilterIconClass : "k-icon k-i-close");
+                    $(filterLblSpan).append("<a href='#'><i class='" + removeIconClass + "'></i></a>");
 
                     $(filterLblSpan).find("a").on("click", function (e) {
                         e.preventDefault();
@@ -358,7 +390,7 @@
                 $("#kendoBasicFilterSearchBox").find(".kendobasicfilter-filter-btn-filter").attr("data-field", currentHeaderData);
                 $("#kendoBasicFilterSearchBox").find(".kendobasicfilter-filter-btn-filter").attr("data-title", currentHeaderTitle);
                 $("#kendoBasicFilterSearchBox").find(".kendobasicfilter-filter-btn-filter").data("kendoBasicFilter", currentFilterOptions);
-                $("#kendoBasicFilterSearchBox").find(".kendobasicfilter-title-lbl").html("filter " + currentHeaderTitle + ":");
+                $("#kendoBasicFilterSearchBox").find(".kendobasicfilter-title-lbl").html("FILTER " + currentHeaderTitle + ":");
 
                 if (currentFilterOption.dataType == "string") {
                     $("#kendoBasicFilterSearchBox").find(".kendobasicfilter-dv-string").css("display", "");

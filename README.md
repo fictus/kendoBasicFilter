@@ -1,4 +1,4 @@
-kendoBasicFilter ver: 1.0.4
+kendoBasicFilter ver: 1.0.4.2
 ----------
 
 An alternate filter control for Kendo Grids if you don't want to use the default Kendo Filter controls;
@@ -21,6 +21,7 @@ After you initiate your kendoGrid then apply kendoBasicFilter like this:
             },
             serverFiltering: true,
 			// filterIconClass: "fa fa-filter", 		-- assing a custom icon class here (if you need to use a different icon then the default)
+			// removeFilterIconClass: "fa fa-close", 	-- assing a custom icon class here (if you need to use a different icon then the default)
             masterFilterText: function () {
                 // if we need to do an "OR" master search alongside our filters, we can pass the filterText here;
 
@@ -103,5 +104,11 @@ After you initiate your kendoGrid then apply kendoBasicFilter like this:
 You can also manually refresh the filters by calling this method:
 ```
 #!javascript
-        $("#tblData").data("kendoBasicFilter").filterBoxOptions.triggerFilter($("#tblData")[0]);
+	$("#tblData").data("kendoBasicFilter").filterBoxOptions.triggerFilter($("#tblData"));
+```
+
+You can also manually clear all filters by calling this method:
+```
+#!javascript
+	$("#tblData").data("kendoBasicFilter").filterBoxOptions.clearAllFilters($("#tblData"));
 ```
