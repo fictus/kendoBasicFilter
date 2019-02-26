@@ -1,5 +1,5 @@
 ﻿/*
-    kendoBasicFilter ver: 1.0.4.2
+    kendoBasicFilter ver: 1.0.4.3
 
 
     How to Use
@@ -14,6 +14,7 @@
                 "background-color": "#4F4F4F",
                 "color": "white"
             },
+			windowLeftTopOffset: "13 13",
             serverFiltering: true,
 			// filterIconClass: "fa fa-filter", 		-- assing a custom icon class here (if you need to use a different icon then the default)
             // removeFilterIconClass: "fa fa-close", 	-- assing a custom icon class here (if you need to use a different icon then the default)
@@ -448,10 +449,12 @@
                     "visibility": "hidden",
                     "display": ""
                 });
+				var userwindowLeftTopOffset = ("windowLeftTopOffset" in currentFilterOptions.filterBoxOptions ? currentFilterOptions.filterBoxOptions.windowLeftTopOffset : "0 0");
                 $("#kendoBasicFilterSearchBox").position({
                     my: "left top",
                     at: "left bottom",
-                    of: currentKendoBasicfilterLnkTrigger
+                    of: currentKendoBasicfilterLnkTrigger,
+                    offset: userwindowLeftTopOffset
                 });
 
                 $("#kendoBasicFilterSearchBox").css({
