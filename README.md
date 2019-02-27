@@ -1,4 +1,4 @@
-kendoBasicFilter ver: 1.0.4.2
+kendoBasicFilter ver: 1.0.4.3
 ----------
 
 An alternate filter control for Kendo Grids if you don't want to use the default Kendo Filter controls;
@@ -19,6 +19,7 @@ After you initiate your kendoGrid then apply kendoBasicFilter like this:
                 "background-color": "#4F4F4F",
                 "color": "white"
             },
+			windowLeftTopOffset: "0 4",
             serverFiltering: true,
 			// filterIconClass: "fa fa-filter", 		-- assing a custom icon class here (if you need to use a different icon then the default)
 			// removeFilterIconClass: "fa fa-close", 	-- assing a custom icon class here (if you need to use a different icon then the default)
